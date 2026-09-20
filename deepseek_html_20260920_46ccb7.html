@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Your Name — Video Editor</title>
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Google Fonts: Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: 'Manrope', sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    img, iframe {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button, .btn {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: inherit;
+    }
+
+    /* ---------- VARIABLES ---------- */
+    :root {
+      --black: #000000;
+      --near-black: #050505;
+      --dark: #0B0B0B;
+      --dark-gray: #111111;
+      --medium-gray: #1A1A1A;
+      --light-gray: #A0A0A0;
+      --white: #FFFFFF;
+      --border-subtle: rgba(255,255,255,0.08);
+      --card-bg: #0B0B0B;
+      --hover-bg: #1A1A1A;
+      --spacing-xs: 0.5rem;
+      --spacing-sm: 1rem;
+      --spacing-md: 2rem;
+      --spacing-lg: 4rem;
+      --spacing-xl: 6rem;
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+    }
+
+    /* ---------- TYPOGRAPHY ---------- */
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+    }
+
+    h2 {
+      font-size: clamp(2rem, 5vw, 3.8rem);
+    }
+
+    h3 {
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    }
+
+    .text-muted {
+      color: var(--light-gray);
+      font-weight: 400;
+    }
+
+    /* ---------- LAYOUT UTILITIES ---------- */
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    .section {
+      padding: var(--spacing-xl) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .section:last-of-type {
+      border-bottom: none;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .flex-between {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .section {
+        padding: var(--spacing-lg) 0;
+      }
+    }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.9rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      transition: all 0.25s ease;
+      background-color: var(--white);
+      color: var(--black);
+      border: 1px solid transparent;
+    }
+
+    .btn:hover {
+      background-color: #e0e0e0;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -10px rgba(255,255,255,0.15);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-icon {
+      gap: 0.5rem;
+    }
+
+    /* ---------- NAVIGATION ---------- */
+    .nav {
+      position: fixed;
+      top: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 3rem);
+      max-width: 1280px;
+      background: rgba(5,5,5,0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 60px;
+      padding: 0.6rem 1.2rem 0.6rem 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 999;
+      transition: all 0.3s ease;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo img {
+      height: 32px;
+      width: auto;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--light-gray);
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--white);
+    }
+
+    .nav-cta .btn {
+      padding: 0.6rem 1.6rem;
+      font-size: 0.85rem;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.6rem;
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .nav-links, .nav-cta {
+        display: none;
+      }
+      .hamburger {
+        display: block;
+      }
+      .nav {
+        padding: 0.6rem 1.2rem;
+      }
+      .nav-logo img {
+        height: 28px;
+      }
+    }
+
+    /* Mobile menu overlay */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0,0,0,0.98);
+      backdrop-filter: blur(20px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+      transform: translateY(-100%);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mobile-menu.active {
+      transform: translateY(0);
+    }
+
+    .mobile-menu a {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.02em;
+      transition: opacity 0.2s;
+    }
+
+    .mobile-menu a:hover {
+      opacity: 0.6;
+    }
+
+    .mobile-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      font-size: 2rem;
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .mobile-menu .btn {
+      font-size: 1.1rem;
+      padding: 1rem 3rem;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 6rem;
+      padding-bottom: 4rem;
+      background: radial-gradient(circle at 30% 40%, rgba(20,20,20,0.9) 0%, #000 70%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-title {
+      max-width: 1100px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title .line-1 {
+      display: block;
+      color: var(--light-gray);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      font-size: clamp(1.2rem, 2vw, 1.6rem);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-title .line-2 {
+      display: block;
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    .hero-sub {
+      font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+      color: var(--light-gray);
+      max-width: 600px;
+      margin-bottom: 2.5rem;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .hero-actions .btn {
+      padding: 1rem 2.4rem;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        min-height: 90vh;
+        padding-top: 7rem;
+      }
+      .hero-actions .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* ---------- SECTION HEADERS ---------- */
+    .section-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--light-gray);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 1rem;
+    }
+
+    .section-desc {
+      color: var(--light-gray);
+      max-width: 600px;
+      font-size: 1.05rem;
+    }
+
+    /* ---------- ABOUT ---------- */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .about-left h2 {
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .about-right p {
+      color: var(--light-gray);
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .stat-item {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1rem;
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--light-gray);
+      margin-top: 0.2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- SERVICES ---------- */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .service-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.8rem 1.5rem;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .service-card:hover {
+      background: var(--hover-bg);
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-4px);
+    }
+
+    .service-icon {
+      font-size: 1.8rem;
+      color: var(--white);
+      opacity: 0.9;
+    }
+
+    .service-card h4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .service-card p {
+      font-size: 0.85rem;
+      color: var(--light-gray);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 1024px) {
+      .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- SOFTWARE PILLS ---------- */
+    .software-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .software-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 60px;
+      padding: 0.9rem 1.8rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+    }
+
+    .software-pill i {
+      font-size: 1.2rem;
+      color: var(--light-gray);
+    }
+
+    .software-pill:hover {
+      background: var(--hover-bg);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ---------- SHOWREEL ---------- */
+    .showreel-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: #0a0a0a;
+      border: 1px solid var(--border-subtle);
+      margin-top: 2rem;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .showreel-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      gap: 1rem;
+    }
+
+    .showreel-wrapper:hover .showreel-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .play-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      transition: transform 0.25s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .play-button:hover {
+      transform: scale(1.08);
+    }
+
+    .showreel-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    /* ---------- PORTFOLIO ---------- */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin: 2rem 0 2.5rem;
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--light-gray);
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .portfolio-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: block;
+    }
+
+    .portfolio-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 20px 30px -20px rgba(0,0,0,0.8);
+    }
+
+    .card-thumb {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #111;
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .portfolio-card:hover .card-thumb img {
+      transform: scale(1.05);
+    }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .portfolio-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-overlay i {
+      font-size: 2.2rem;
+      color: var(--white);
+    }
+
+    .card-body {
+      padding: 1.2rem 1.2rem 1.5rem;
+    }
+
+    .card-category {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--light-gray);
+      margin-bottom: 0.3rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .card-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--light-gray);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: color 0.2s ease;
+    }
+
+    .portfolio-card:hover .card-link {
+      color: var(--white);
+    }
+
+    .portfolio-card.hidden {
+      display: none;
+    }
+
+    @media (max-width: 1024px) {
+      .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- PRICING ---------- */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .pricing-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem 2rem;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pricing-card:hover {
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-4px);
+    }
+
+    .pricing-card h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .price-tag {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin: 0.5rem 0;
+    }
+
+    .price-tag span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--light-gray);
+    }
+
+    .pricing-note {
+      color: var(--light-gray);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .custom-cta {
+      margin-top: 2.5rem;
+      padding: 1.5rem 0;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 1.1rem;
+      color: var(--light-gray);
+    }
+
+    .custom-cta a {
+      color: var(--white);
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      transition: border-color 0.2s;
+    }
+
+    .custom-cta a:hover {
+      border-color: var(--white);
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- TESTIMONIALS ---------- */
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 2rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .testimonial-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--light-gray);
+    }
+
+    .testimonial-text {
+      font-size: 0.95rem;
+      color: #ddd;
+      line-height: 1.5;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      font-size: 0.85rem;
+      color: var(--light-gray);
+      font-weight: 500;
+    }
+
+    @media (max-width: 1024px) {
+      .testimonials-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---------- CONTACT ---------- */
+    .contact-section {
+      background: var(--near-black);
+      padding: var(--spacing-xl) 0;
+      border-bottom: none;
+    }
+
+    .contact-title {
+      font-size: clamp(2rem, 4.5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+
+    .contact-sub {
+      color: var(--light-gray);
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .contact-socials {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      color: var(--light-gray);
+      transition: color 0.2s ease;
+      padding: 0.5rem 0;
+    }
+
+    .social-link i {
+      font-size: 1.2rem;
+    }
+
+    .social-link:hover {
+      color: var(--white);
+    }
+
+    /* ---------- FOOTER ---------- */
+    .footer {
+      background: var(--black);
+      padding: 3rem 0 2rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .footer-brand img {
+      height: 28px;
+      width: auto;
+    }
+
+    .footer-role {
+      font-size: 0.85rem;
+      color: var(--light-gray);
+      margin-left: 0.3rem;
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--light-gray);
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 1.2rem;
+    }
+
+    .footer-socials a {
+      color: var(--light-gray);
+      font-size: 1.1rem;
+      transition: color 0.2s ease;
+    }
+
+    .footer-socials a:hover {
+      color: var(--white);
+    }
+
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    /* ---------- ANIMATIONS ---------- */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-up-delay-1 { transition-delay: 0.1s; }
+    .fade-up-delay-2 { transition-delay: 0.2s; }
+    .fade-up-delay-3 { transition-delay: 0.3s; }
+
+    /* ---------- SCROLLBAR ---------- */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a2a2a;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3a3a3a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVIGATION ========== -->
+  <nav class="nav" id="navbar">
+    <a href="#" class="nav-logo" aria-label="Home">
+      <img src="Logo.png" alt="Your Name logo" onerror="this.style.display='none'">
+      <span>Your Name</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#work">Work</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#contact" class="btn">Hire Me</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+      <i class="fas fa-bars"></i>
+    </button>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" id="mobileClose" aria-label="Close menu">
+      <i class="fas fa-times"></i>
+    </button>
+    <a href="#work">Work</a>
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+    <a href="#contact" class="btn" style="margin-top:1rem;">Hire Me</a>
+  </div>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-title fade-up">
+        <span class="line-1">I don't make videos,</span>
+        <span class="line-2">I make emotions.</span>
+      </div>
+      <p class="hero-sub fade-up fade-up-delay-1">
+        Turning raw footage into engaging visual stories that people remember.
+      </p>
+      <div class="hero-actions fade-up fade-up-delay-2">
+        <a href="#work" class="btn">View My Work</a>
+        <a href="#contact" class="btn btn-outline">Let's Work Together</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ABOUT ========== -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-left fade-up">
+          <div class="section-label">About</div>
+          <h2>Editing with<br>intention.</h2>
+        </div>
+        <div class="about-right fade-up fade-up-delay-1">
+          <p>
+            I'm a freelance video editor focused on pacing, emotion, and clarity. 
+            Every cut is a decision — I shape raw footage into stories that hold attention 
+            and feel effortless to watch.
+          </p>
+          <p>
+            With experience across YouTube, gaming, documentary, and social formats, 
+            I bring a cinematic eye to projects of any scale. No over-editing. 
+            No noise. Just clean, purposeful storytelling.
+          </p>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-number">2+</div>
+              <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">8</div>
+              <div class="stat-label">Editing Services</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">2</div>
+              <div class="stat-label">Core Tools</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">∞</div>
+              <div class="stat-label">Revisions</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SERVICES + SOFTWARE ========== -->
+  <section class="section" id="services">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Services</div>
+        <h2 class="section-title">What I edit.</h2>
+        <p class="section-desc">From long-form storytelling to fast-paced social content — every format gets the same attention to detail.</p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card fade-up">
+          <i class="fas fa-video service-icon"></i>
+          <h4>YouTube Video Editing</h4>
+          <p>Retention-focused edits that keep viewers watching.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-1">
+          <i class="fas fa-mobile-alt service-icon"></i>
+          <h4>YouTube Shorts / Reels</h4>
+          <p>Vertical edits built for speed and scroll-stopping hooks.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-2">
+          <i class="fas fa-gamepad service-icon"></i>
+          <h4>Gaming Video Editing</h4>
+          <p>High-energy cuts, clean overlays, and smooth pacing.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-3">
+          <i class="fas fa-film service-icon"></i>
+          <h4>Documentary Video Editing</h4>
+          <p>Structure, rhythm, and narrative clarity for real stories.</p>
+        </div>
+        <div class="service-card fade-up">
+          <i class="fas fa-camera-retro service-icon"></i>
+          <h4>Cinematic Video Editing</h4>
+          <p>Mood-driven editing with atmosphere and intention.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-1">
+          <i class="fas fa-hashtag service-icon"></i>
+          <h4>Social Media Video Editing</h4>
+          <p>Platform-ready edits that feel native and polished.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-2">
+          <i class="fas fa-magic service-icon"></i>
+          <h4>Motion Graphics</h4>
+          <p>Clean titles, transitions, and visual emphasis.</p>
+        </div>
+        <div class="service-card fade-up fade-up-delay-3">
+          <i class="fas fa-palette service-icon"></i>
+          <h4>Color Grading</h4>
+          <p>Consistent, cinematic color that elevates the final look.</p>
+        </div>
+      </div>
+
+      <div style="margin-top: 3.5rem;" class="fade-up">
+        <div class="section-label">Software</div>
+        <div class="software-row">
+          <div class="software-pill">
+            <i class="fas fa-play-circle"></i> Adobe Premiere Pro
+          </div>
+          <div class="software-pill">
+            <i class="fas fa-star-of-life"></i> Adobe After Effects
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SHOWREEL ========== -->
+  <section class="section" id="showreel">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Showreel</div>
+        <h2 class="section-title">Watch the work.</h2>
+        <p class="section-desc">A quick look at the pacing, feel, and detail I bring to every edit.</p>
+      </div>
+
+      <div class="showreel-wrapper fade-up fade-up-delay-1">
+        <div class="video-container">
+          <iframe 
+            src="https://www.youtube.com/embed/RSPXmYuAIJg?rel=0&modestbranding=1" 
+            title="Showreel — Your Name" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+          <div class="showreel-overlay">
+            <div class="play-button" aria-label="Play showreel">
+              <i class="fas fa-play"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showreel-actions fade-up fade-up-delay-2">
+        <a href="https://youtube.com/shorts/RSPXmYuAIJg" target="_blank" rel="noopener" class="btn btn-icon">
+          <i class="fab fa-youtube"></i> Watch Showreel
+        </a>
+        <a href="https://youtube.com/shorts/RSPXmYuAIJg" target="_blank" rel="noopener" class="btn btn-outline btn-icon">
+          <i class="fas fa-external-link-alt"></i> Open on YouTube
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PORTFOLIO ========== -->
+  <section class="section" id="work">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Selected Work</div>
+        <h2 class="section-title">Projects.</h2>
+        <p class="section-desc">A few recent edits across different formats and styles.</p>
+      </div>
+
+      <div class="filter-bar fade-up fade-up-delay-1">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="gaming">Gaming</button>
+        <button class="filter-btn" data-filter="vlog">Vlog</button>
+        <button class="filter-btn" data-filter="documentary">Documentary</button>
+      </div>
+
+      <div class="portfolio-grid" id="portfolioGrid">
+        <!-- Project 1 -->
+        <a href="https://youtu.be/nC5Ur61kDwI" target="_blank" rel="noopener" class="portfolio-card fade-up" data-category="gaming">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/nC5Ur61kDwI/maxresdefault.jpg" 
+                 onerror="this.onerror=null; this.src='https://img.youtube.com/vi/nC5Ur61kDwI/hqdefault.jpg';"
+                 alt="Gaming video thumbnail" loading="lazy">
+            <div class="card-overlay"><i class="fas fa-play-circle"></i></div>
+          </div>
+          <div class="card-body">
+            <div class="card-category">Gaming</div>
+            <div class="card-title">Your Name</div>
+            <div class="card-link">Watch Project <i class="fas fa-arrow-right"></i></div>
+          </div>
+        </a>
+
+        <!-- Project 2 -->
+        <a href="https://youtu.be/9eCuKsDeLic" target="_blank" rel="noopener" class="portfolio-card fade-up fade-up-delay-1" data-category="vlog">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/9eCuKsDeLic/maxresdefault.jpg" 
+                 onerror="this.onerror=null; this.src='https://img.youtube.com/vi/9eCuKsDeLic/hqdefault.jpg';"
+                 alt="Vlog video thumbnail" loading="lazy">
+            <div class="card-overlay"><i class="fas fa-play-circle"></i></div>
+          </div>
+          <div class="card-body">
+            <div class="card-category">Vlog</div>
+            <div class="card-title">Your Client Name</div>
+            <div class="card-link">Watch Project <i class="fas fa-arrow-right"></i></div>
+          </div>
+        </a>
+
+        <!-- Project 3 -->
+        <a href="https://youtu.be/tafyIoQlX5k" target="_blank" rel="noopener" class="portfolio-card fade-up fade-up-delay-2" data-category="documentary">
+          <div class="card-thumb">
+            <img src="https://img.youtube.com/vi/tafyIoQlX5k/maxresdefault.jpg" 
+                 onerror="this.onerror=null; this.src='https://img.youtube.com/vi/tafyIoQlX5k/hqdefault.jpg';"
+                 alt="Documentary video thumbnail" loading="lazy">
+            <div class="card-overlay"><i class="fas fa-play-circle"></i></div>
+          </div>
+          <div class="card-body">
+            <div class="card-category">Documentary</div>
+            <div class="card-title">Your Client Name</div>
+            <div class="card-link">Watch Project <i class="fas fa-arrow-right"></i></div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRICING ========== -->
+  <section class="section" id="pricing">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Pricing</div>
+        <h2 class="section-title">Simple rates.</h2>
+        <p class="section-desc">Clear, per-unit pricing. No hidden fees.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="pricing-card fade-up">
+          <h3>Video Editing</h3>
+          <div class="price-tag">₹100 <span>/ minute</span></div>
+          <p class="pricing-note">Final edited runtime. Includes cuts, pacing, basic color, and sound balancing.</p>
+        </div>
+        <div class="pricing-card fade-up fade-up-delay-1">
+          <h3>Shorts / Reels</h3>
+          <div class="price-tag">₹5 <span>/ second</span></div>
+          <p class="pricing-note">Vertical, platform-optimized edits. Includes captions, hooks, and clean cuts.</p>
+        </div>
+      </div>
+
+      <div class="custom-cta fade-up fade-up-delay-2">
+        Custom projects? <a href="#contact">Let's discuss your requirements.</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TESTIMONIALS ========== -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="fade-up">
+        <div class="section-label">Client Feedback</div>
+        <h2 class="section-title">What clients say.</h2>
+        <p class="section-desc">Sample testimonials — replace with real client feedback when available.</p>
+      </div>
+
+      <div class="testimonials-grid">
+        <div class="testimonial-card fade-up">
+          <div class="testimonial-label">Client Feedback</div>
+          <p class="testimonial-text">"The pacing was perfect. My retention went up and the edit felt natural, not overdone."</p>
+          <div class="testimonial-author">— Client Name, YouTube Creator</div>
+        </div>
+        <div class="testimonial-card fade-up fade-up-delay-1">
+          <div class="testimonial-label">Client Feedback</div>
+          <p class="testimonial-text">"Clean communication, fast turnaround, and a final cut that exceeded what I imagined."</p>
+          <div class="testimonial-author">— Client Name, Brand Manager</div>
+        </div>
+        <div class="testimonial-card fade-up fade-up-delay-2">
+          <div class="testimonial-label">Client Feedback</div>
+          <p class="testimonial-text">"Understood the tone immediately. The color and sound were on point from the first draft."</p>
+          <div class="testimonial-author">— Client Name, Documentary Producer</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CONTACT ========== -->
+  <section class="contact-section" id="contact">
+    <div class="container">
+      <div class="fade-up">
+        <h2 class="contact-title">Have footage?<br>Let's turn it into something worth watching.</h2>
+        <p class="contact-sub">Reach out and let's talk about your project, timeline, and vision.</p>
+      </div>
+
+      <div class="contact-buttons fade-up fade-up-delay-1">
+        <a href="#contact" class="btn">Start a Project</a>
+        <a href="#work" class="btn btn-outline">View My Work</a>
+      </div>
+
+      <div class="contact-socials fade-up fade-up-delay-2">
+        <a href="#" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <a href="#" class="social-link" aria-label="Discord"><i class="fab fa-discord"></i> Discord</a>
+        <a href="#" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#" class="social-link" aria-label="Email"><i class="fas fa-envelope"></i> Email</a>
+        <a href="#" class="social-link" aria-label="YouTube"><i class="fab fa-youtube"></i> YouTube</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="Logo.png" alt="Your Name logo" onerror="this.style.display='none'">
+          <span>Your Name</span>
+          <span class="footer-role">Video Editor</span>
+        </div>
+        <div class="footer-copy">
+          Copyright © 2026 Your Name
+        </div>
+        <div class="footer-socials">
+          <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== JAVASCRIPT ========== -->
+  <script>
+    (function() {
+      // ---------- MOBILE MENU ----------
+      const hamburger = document.getElementById('hamburgerBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileClose = document.getElementById('mobileClose');
+
+      if (hamburger && mobileMenu && mobileClose) {
+        hamburger.addEventListener('click', () => {
+          mobileMenu.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+        mobileClose.addEventListener('click', () => {
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
+      }
+
+      // ---------- PORTFOLIO FILTER ----------
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const portfolioCards = document.querySelectorAll('.portfolio-card');
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.dataset.filter;
+
+          portfolioCards.forEach(card => {
+            if (filter === 'all' || card.dataset.category === filter) {
+              card.classList.remove('hidden');
+              card.style.display = 'block';
+              requestAnimationFrame(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+              });
+            } else {
+              card.classList.add('hidden');
+              card.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // ---------- SCROLL REVEAL (fade-up) ----------
+      const fadeElements = document.querySelectorAll('.fade-up');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+      });
+
+      fadeElements.forEach(el => observer.observe(el));
+
+      // ---------- NAV SCROLL EFFECT ----------
+      const nav = document.getElementById('navbar');
+      let lastScroll = 0;
+
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        if (currentScroll > 80) {
+          nav.style.background = 'rgba(5,5,5,0.95)';
+          nav.style.borderColor = 'rgba(255,255,255,0.12)';
+        } else {
+          nav.style.background = 'rgba(5,5,5,0.85)';
+          nav.style.borderColor = 'rgba(255,255,255,0.08)';
+        }
+        lastScroll = currentScroll;
+      }, { passive: true });
+
+      // ---------- SHOWREEL OVERLAY CLICK (play button) ----------
+      const playButton = document.querySelector('.play-button');
+      if (playButton) {
+        playButton.addEventListener('click', () => {
+          const iframe = document.querySelector('.video-container iframe');
+          if (iframe) {
+            const src = iframe.src;
+            iframe.src = src.includes('autoplay=1') ? src : src + '&autoplay=1';
+          }
+        });
+      }
+
+      // ---------- ACCESSIBILITY: keyboard for filter buttons ----------
+      filterBtns.forEach(btn => {
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            btn.click();
+          }
+        });
+      });
+    })();
+  </script>
+
+</body>
+</html>
